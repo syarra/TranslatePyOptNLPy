@@ -1,0 +1,14 @@
+Python module for translating a pyOpt model into a NLPy model and vice versa.
+
+
+Packages required :
+    * pyOpt
+    * NLPy
+
+
+The data directory contains some models to be used with the exampleAmplModel.py
+file, as follows :
+
+eg. >>>> python exampleAmplModel.py data/blend
+
+
