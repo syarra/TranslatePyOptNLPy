@@ -7,7 +7,7 @@ Translation between pyOpt and NLPy
 import numpy
 from pyOpt import Optimization
 from pyOpt.pyOpt_gradient import Gradient
-from nlpy.model import NLPModel
+from nlp.model.nlpmodel import NLPModel
 
 
 """
@@ -33,7 +33,7 @@ class PyOpt_From_NLPModel(Optimization):
         # Initialize model.
         Optimization.__init__(self, nlpy_model.name, lambda x:
                                     (self.nlpy_model.obj(x),
-                                     self.nlpy_model.cons(x),0),
+                                     self.nlpy_model.cons(x).tolist(),0),
                                      var_set={}, obj_set={}, con_set={},
                                      use_groups=False, **kwargs)
 
@@ -76,12 +76,8 @@ class PyOpt_From_NLPModel(Optimization):
 
     def grad_func(self, x, f, g):
 
-        g_obj = numpy.array([self.nlpy_model.grad(x)])
-        g_con = numpy.zeros([self.nlpy_model.m, self.nlpy_model.n])
-
-        for i in range(0,self.nlpy_model.m):
-            g_con[i] = self.nlpy_model.igrad(i,x)
-
+        g_obj = numpy.array([self.nlpy_model.grad(x).tolist()])
+        g_con = self.nlpy_model.jac(x)
         fail = 0
         return g_obj, g_con, fail
 

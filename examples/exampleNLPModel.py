@@ -19,74 +19,68 @@
                         x2 <= 1000
 """
 
-import numpy
+import numpy as np
 
 # Import NLPModel class
-from nlpy.model import NLPModel
+from nlp.model.nlpmodel import NLPModel
 from translatePyoptNLPy import *
 
 # Import a solver from the pyOpt package
 from pyOpt import SNOPT
-
-# Define an objective function
-def rosenbrock(x):
-    return 100. * (x[1] - x[0]**2)**2 + (1. - x[0])**2
-
-
-# and its gradient
-def gradient_rosenbrock(x):
-    grad = numpy.zeros(nlp.n)
-    grad[0] = -400. * x[0] * (x[1] - x[0]**2) + 2. * x[0] -2.
-    grad[1] = 200. * (x[1] - x[0]**2)
-
-    return grad
-
-
-# Define a constraint
-def constraint(x):
-
-    return numpy.array([2.*x[1],3.*x[0]])
-
-
-# and its gradient 
-def gradient_constraint(i,x):
-
-    grad = numpy.zeros(nlp.n)
-
-    if i == 1:
-        grad[0] = 0.
-        grad[1] = 2.
-    elif i == 2:
-        grad[0] = 3.
-        grad[1] = 0.
-
-    return grad
-
-
-Infinity = numpy.inf
+from pyOpt import ALGENCAN
 
 # Create an instance of an NLPModel
-nlp = NLPModel(n=2, m=2, name='Rosenbrock',
-        Lvar=numpy.array([-1000,-Infinity]), Uvar=numpy.array([Infinity,1000]),
-        Lcon=numpy.array([-2000,-1000]), Ucon=numpy.array([2000,1000]),
-        x0 = numpy.array([-1.2, 1]))
+class example(NLPModel):
+    def __init__(self):
 
+        NLPModel.__init__(self, 2, m=2, name='Rosenbrock', x0 = np.array([-1.2, 1]),
+                 Lvar=np.array([-1000,-np.inf]), Uvar=np.array([np.inf,1000]),
+                 Lcon=np.array([-2000,-1000]), Ucon=np.array([2000,1000]))
 
-# Assign an objective function and its gradient
-nlp.obj = rosenbrock
-nlp.grad = gradient_rosenbrock
+    def obj(self, x):
+        # Define an objective function
+        fx = 100.*(x[1] - x[0]**2)**2 + (1. - x[0])**2
+        return fx
 
-# Assign constraints and its gradients
-nlp.cons = constraint
-nlp.igrad = gradient_constraint
+    def grad(self, x):
+        # and its gradient
+        grad = np.zeros(self.n) 
+        grad[0] = -400. * x[0] * (x[1] - x[0]**2) + 2. * x[0] -2.
+        grad[1] = 200. * (x[1] - x[0]**2)
+        return grad
+
+    def cons(self, x):
+        # Define a constraint
+        cons = np.zeros(self.m)
+        cons[0] = 2.*x[1]
+        cons[1] = 3.*x[0]
+        return cons
+
+    def jac(self, x):
+        # and its jacobian
+        jac = np.zeros([self.m, self.n])
+        jac[0][0] = 0.
+        jac[0][1] = 2.
+        jac[1][0] = 3.
+        jac[1][1] = 0.
+
+        return jac
 
 
 # Translate this NLPy problem in a pyOpt problem
-
+nlp = example()
 opt_prob = PyOpt_From_NLPModel(nlp)
 print opt_prob
 
+# Instantiate Optimizer (ALGENCAN) & Solve Problem
+algencan = ALGENCAN()
+algencan.setOption('iprint',0)
+algencan(opt_prob)
+print opt_prob.solution(0)
+
+
 # Call the imported solver SNOPT
+
 snopt = SNOPT()
 
 # Choose sensitivity type for computing gradients with :
@@ -100,18 +94,5 @@ SensType = opt_prob.grad_func
 snopt(opt_prob, sens_type=SensType)
 
 # Print solution
-print opt_prob._solutions[0]
-
-
-# Change the sensitivity type to finite difference and solve again
-SensType = 'FD'
-snopt(opt_prob, sens_type=SensType)
-print opt_prob._solutions[1]
-
-
-# Change the sensitivity type to complex step and solve again
-SensType = 'CS'
-snopt(opt_prob, sens_type=SensType)
-print opt_prob._solutions[2]
-
+print opt_prob.solution(1)
 
