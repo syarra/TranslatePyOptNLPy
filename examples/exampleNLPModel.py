@@ -1,12 +1,9 @@
-##################################
-# Use an NLP model into pyOpt #
-##################################
-"""
+"""Use of an NLP.py model into pyOpt
     Use :
 
     >>>python exampleNLPModel.py
 
-    Represents a NLP as NLPModel Class and convert it to a pyOpt problem.
+    Represents a NLP.py model as NLPModel Class and convert it to a pyOpt problem.
 
     Example :
 
@@ -34,12 +31,12 @@ class example(NLPModel):
     def __init__(self):
 
         NLPModel.__init__(self, 2, m=2, name='Rosenbrock', x0 = np.array([-1.2, 1]),
-                 Lvar=np.array([-1000,-np.inf]), Uvar=np.array([np.inf,1000]),
-                 Lcon=np.array([-2000,-1000]), Ucon=np.array([2000,1000]))
+                 Lvar=np.array([-1000, -np.inf]), Uvar=np.array([np.inf, 1000]),
+                 Lcon=np.array([-2000, -1000]), Ucon=np.array([2000, 1000]))
 
     def obj(self, x):
         # Define an objective function
-        fx = 100.*(x[1] - x[0]**2)**2 + (1. - x[0])**2
+        fx = 100. * (x[1] - x[0]**2)**2 + (1. - x[0])**2
         return fx
 
     def grad(self, x):
@@ -52,8 +49,8 @@ class example(NLPModel):
     def cons(self, x):
         # Define a constraint
         cons = np.zeros(self.m)
-        cons[0] = 2.*x[1]
-        cons[1] = 3.*x[0]
+        cons[0] = 2. * x[1]
+        cons[1] = 3. * x[0]
         return cons
 
     def jac(self, x):
@@ -74,7 +71,7 @@ print opt_prob
 
 # Instantiate Optimizer (ALGENCAN) & Solve Problem
 algencan = ALGENCAN()
-algencan.setOption('iprint',0)
+algencan.setOption('iprint', 0)
 algencan(opt_prob)
 print opt_prob.solution(0)
 
@@ -84,7 +81,7 @@ print opt_prob.solution(0)
 snopt = SNOPT()
 
 # Choose sensitivity type for computing gradients with :
-#  opt_prob.grad_func : NLPy is computing the gradients through the grad_func
+#  opt_prob.grad_func : NLP.py is computing the gradients through the grad_func
 #                       function
 #  'FD' : finite difference
 #  'CS' : complex step
