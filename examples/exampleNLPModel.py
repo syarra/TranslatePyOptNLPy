@@ -35,26 +35,26 @@ class example(NLPModel):
                  Lcon=np.array([-2000, -1000]), Ucon=np.array([2000, 1000]))
 
     def obj(self, x):
-        # Define an objective function
+        """Define an objective function.
         fx = 100. * (x[1] - x[0]**2)**2 + (1. - x[0])**2
         return fx
 
     def grad(self, x):
-        # and its gradient
+        """Define the gradient of the objective function."""
         grad = np.zeros(self.n) 
         grad[0] = -400. * x[0] * (x[1] - x[0]**2) + 2. * x[0] -2.
         grad[1] = 200. * (x[1] - x[0]**2)
         return grad
 
     def cons(self, x):
-        # Define a constraint
+        """Define a constraint."""
         cons = np.zeros(self.m)
         cons[0] = 2. * x[1]
         cons[1] = 3. * x[0]
         return cons
 
     def jac(self, x):
-        # and its jacobian
+        """Define the Jacobian of the constraints."""
         jac = np.zeros([self.m, self.n])
         jac[0][0] = 0.
         jac[0][1] = 2.
@@ -77,7 +77,6 @@ print opt_prob.solution(0)
 
 
 # Call the imported solver SNOPT
-
 snopt = SNOPT()
 
 # Choose sensitivity type for computing gradients with :
