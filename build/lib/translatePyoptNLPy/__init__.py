@@ -1,2 +1,0 @@
-from translatePyoptNLPy import *
-
